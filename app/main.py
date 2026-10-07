@@ -13,50 +13,47 @@ class Incidencia(BaseModel):
     descripcion: str
     estado: str
     prioridad: str
-    tecnico: Optional[str] = None
+    tecnico: str
 
+# Base de datos en memoria
+incidencias_db: List[Incidencia] = []
 
-# Datos ficticios cargados en memoria
-db_incidencias: List[Incidencia] = [
-    Incidencia(
-        id=1,
-        titulo="Fallo en la impresora",
-        descripcion="La impresora de la planta 2 no saca papel",
-        estado="Abierta",
-        prioridad="Media",
-        tecnico="Carlos",
-    ),
-    Incidencia(
-        id=2,
-        titulo="Error de login",
-        descripcion="Varios usuarios no pueden acceder al portal",
-        estado="En proceso",
-        prioridad="Alta",
-        tecnico="Lucía",
-    ),
-]
+@app.get("/")
+def inicio():
+    return {"mensaje": "API de incidencias operativa"}
 
+# POST /incidencias: Crear nueva incidencia
+@app.post("/incidencias", status_code=status.HTTP_201_CREATED, response_model=Incidencia)
+def crear_incidencia(incidencia: Incidencia):
+    for inc in incidencias_db:
+        if inc.id == incidencia.id:
+            raise HTTPException(
+                status_code=400, 
+                detail="Ya existe una incidencia con este ID"
+            )
+    incidencias_db.append(incidencia)
+    return incidencia
 
-# 3. Endpoint: Consultar incidencia por ID
-@app.get(
-    "/incidencias/{id}",
-    response_model=Incidencia,
-    status_code=status.HTTP_200_OK,
-    summary="Consultar una incidencia por su ID",
-)
-def listar_incidencias():
-    """Devuelve el listado completo de incidencias registradas en memoria."""
-    return db_incidencias
-def obtener_incidencia_por_id(id: int):
-    """Devuelve la información de una incidencia concreta.
-
-    Si no existe, retorna un error HTTP 404 (Not Found).
-    """
-    for incidencia in db_incidencias:
-        if incidencia.id == id:
-            return incidencia
-
+# PUT /incidencias/{id}: Modificar una incidencia existente
+@app.put("/incidencias/{id}", response_model=Incidencia)
+def editar_incidencia(id: int, incidencia_actualizada: Incidencia):
+    for index, inc in enumerate(incidencias_db):
+        if inc.id == id:
+            incidencias_db[index] = incidencia_actualizada
+            return incidencia_actualizada
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"La incidencia con ID {id} no existe.",
+        status_code=status.HTTP_404_NOT_FOUND, 
+        detail="Incidencia no encontrada"
+    )
+
+# DELETE /incidencias/{id}: Eliminar una incidencia
+@app.delete("/incidencias/{id}", status_code=status.HTTP_200_OK)
+def eliminar_incidencia(id: int):
+    for index, inc in enumerate(incidencias_db):
+        if inc.id == id:
+            incidencias_db.pop(index)
+            return {"mensaje": f"Incidencia con ID {id} eliminada correctamente"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, 
+        detail="Incidencia no encontrada"
     )
