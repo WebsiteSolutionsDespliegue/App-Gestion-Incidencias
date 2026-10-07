@@ -31,3 +31,27 @@ def crear_incidencia(incidencia: Incidencia):
             )
     incidencias_db.append(incidencia)
     return incidencia
+
+# PUT /incidencias/{id}: Modificar una incidencia existente
+@app.put("/incidencias/{id}", response_model=Incidencia)
+def editar_incidencia(id: int, incidencia_actualizada: Incidencia):
+    for index, inc in enumerate(incidencias_db):
+        if inc.id == id:
+            incidencias_db[index] = incidencia_actualizada
+            return incidencia_actualizada
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, 
+        detail="Incidencia no encontrada"
+    )
+
+# DELETE /incidencias/{id}: Eliminar una incidencia
+@app.delete("/incidencias/{id}", status_code=status.HTTP_200_OK)
+def eliminar_incidencia(id: int):
+    for index, inc in enumerate(incidencias_db):
+        if inc.id == id:
+            incidencias_db.pop(index)
+            return {"mensaje": f"Incidencia con ID {id} eliminada correctamente"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, 
+        detail="Incidencia no encontrada"
+    )
