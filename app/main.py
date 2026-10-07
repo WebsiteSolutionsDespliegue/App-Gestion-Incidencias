@@ -36,20 +36,10 @@ db_incidencias: List[Incidencia] = [
 ]
 
 
-# Endpoint: Consulta de incidencia por ID
+# 3. Endpoint GET /incidencias
 @app.get(
-    "/incidencias/{id}",
-    response_model=Incidencia,
+    "/incidencias",
+    response_model=List[Incidencia],
     status_code=status.HTTP_200_OK,
-    summary="Consultar incidencia por ID",
+    summary="Listar todas las incidencias",
 )
-def obtener_incidencia_por_id(id: int):
-    """Permite consultar los datos de una incidencia concreta a partir de su ID."""
-    for incidencia in db_incidencias:
-        if incidencia.id == id:
-            return incidencia
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"No se encontró ninguna incidencia con el ID {id}.",
-    )
