@@ -1,3 +1,4 @@
+# 2. Endpoint GET /incidencias
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
@@ -43,6 +44,9 @@ db_incidencias: List[Incidencia] = [
     status_code=status.HTTP_200_OK,
     summary="Consultar una incidencia por su ID",
 )
+def listar_incidencias():
+    """Devuelve el listado completo de incidencias registradas en memoria."""
+    return db_incidencias
 def obtener_incidencia_por_id(id: int):
     """Devuelve la información de una incidencia concreta.
 
