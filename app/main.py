@@ -1,15 +1,17 @@
+# 2. Endpoint GET /incidencias
+from typing import List, Optional
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
-from typing import List
 
-app = FastAPI(title="API de incidencias")
+app = FastAPI(title="Gestión de Incidencias")
 
-# Modelo de datos del PDF
+
+# Modelo de datos de la incidencia
 class Incidencia(BaseModel):
     id: int
     titulo: str
     descripcion: str
-    estado: str = "abierta"
+    estado: str
     prioridad: str
     tecnico: str
 
